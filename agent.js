@@ -5,13 +5,13 @@ const templates = { // Templates para a IA usar de base
         alternativas: ["", "", "", ""],
         gabarito: 0
     },
-
+    
     VddouFls: {
         tipo: "Verdadeiro ou falso",
         enunciado: "",
         gabarito: true
     },
-
+    
     Descrito: {
         tipo: "Descritiva",
         enunciado: "",
@@ -20,10 +20,27 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
+let RespsUsu = [];
+
+function corrigir() { // Corrigir e dar feedback para as questões do usuário
+    
+ }
+
 const templatesArray = Object.values(templates)
 
-function mostrar(questao, num) {
+function clear() { // Remover questões antigas
+    Array.from(document.body.children).forEach((d, i) => {
+        if (d.name == "questao"){
+            d.remove()
+        }
+    })
+}
+
+function mostrar(questao, num) { // Mostrar as questões criadas por IA
+    clear()
     questao.forEach((q, i) => { // Questão
+
+        console.log(q)
 
         const div = document.createElement('div')
 
@@ -32,6 +49,7 @@ function mostrar(questao, num) {
 
         enc.textContent = q.enunciado
 
+        div.name = "questao"
         div.appendChild(enc)
 
         if (q.criterios) { // Descritiva
@@ -83,6 +101,11 @@ function mostrar(questao, num) {
 
         document.body.appendChild(div)
     })
+
+    const corr = document.createElement('button')
+    corr.onclick = ()=> corrigir()
+    corr.textContent = "👌❓"
+    document.body.appendChild(corr)
 }
 
 async function enviar() {
