@@ -13,10 +13,14 @@
         <h1>GingerBread</h1>
         <input id="key" type="password" placeholder="Seu token aqui">
 
-        <input id="num" type="number" placeholder="Número">
-        <input id="msg" type="text" placeholder="Assunto da prova">
-        <button onclick="enviar()">📤</button>
-
+        <div class="container">
+            <div class="questionnaire-header">
+                <input id="questions-input" type="number" placeholder="Número de Perguntas">
+                <input id="subject-input" type="text" placeholder="Assunto De Estudos">
+                <button id="send-button">Gerar Perguntas</button>
+            </div>
+            <div id="questionnaire-answers" class="answers"></div>
+        </div>
     </div>
 
     <script src="/assets/js/GingerBread.js"></script>

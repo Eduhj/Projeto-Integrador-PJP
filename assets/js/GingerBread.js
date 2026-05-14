@@ -1,3 +1,6 @@
+const inputMessage = document.getElementById('subject-input')
+const answersQuest = document.getElementById('questionnaire-answers')
+
 const templates = { // Templates para a IA usar de base
     MultEsc: {
         tipo: "Multipla escolha",
@@ -5,13 +8,13 @@ const templates = { // Templates para a IA usar de base
         alternativas: ["", "", "", ""],
         gabarito: 0
     },
-    
+
     VddouFls: {
         tipo: "Verdadeiro ou falso",
         enunciado: "",
         gabarito: true
     },
-    
+
     Descrito: {
         tipo: "Descritiva",
         enunciado: "",
@@ -23,14 +26,14 @@ const templates = { // Templates para a IA usar de base
 let RespsUsu = [];
 
 function corrigir() { // Corrigir e dar feedback para as questões do usuário
-    
- }
+
+}
 
 const templatesArray = Object.values(templates)
 
 function clear() { // Remover questões antigas
-    Array.from(document.body.children).forEach((d, i) => {
-        if (d.name == "questao"){
+    Array.from(document.body.children).forEach((d) => {
+        if (d.name == "questao") {
             d.remove()
         }
     })
@@ -43,13 +46,13 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
         console.log(q)
 
         const div = document.createElement('div')
-
         const lst = document.createElement('ul')
         const enc = document.createElement('h2')
 
         enc.textContent = q.enunciado
 
         div.name = "questao"
+        div.setAttribute('class', 'answers')
         div.appendChild(enc)
 
         if (q.criterios) { // Descritiva
@@ -99,19 +102,20 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
             div.appendChild(lf)
         }
 
-        document.body.appendChild(div)
+        answersQuest.appendChild(div)
     })
 
     const corr = document.createElement('button')
-    corr.onclick = ()=> corrigir()
-    corr.textContent = "👌❓"
+    corr.onclick = () => corrigir()
+    corr.textContent = "Corrigir"
     document.body.appendChild(corr)
 }
 
 async function enviar() {
     const token = document.getElementById('key').value
-    const msg = document.getElementById('msg').value
-    const num = document.getElementById('num').value
+    const num = document.getElementById('questions-input').value
+
+    const msg = inputMessage.value
 
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { // Enviar para os servers da groq
         method: "POST",
@@ -138,3 +142,11 @@ async function enviar() {
     const questao = JSON.parse(limpo)
     mostrar(questao, num)
 }
+
+const sendButton = document.getElementById('send-button')
+
+inputMessage.addEventListener('keydown', (e) => {
+    if(e.key === 'Enter') sendButton.click()
+})
+
+sendButton.addEventListener('click', enviar)
