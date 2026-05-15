@@ -23,20 +23,44 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
-let RespsUsu = [];
 
-function corrigir() { // Corrigir e dar feedback para as questões do usuário
 
+function corrigir() {
+    // Seleciona todas as divs de questões
+    const questoes = document.querySelectorAll('.answers');
+    const respostas = [];
+
+    questoes.forEach((div, i) => {
+        // PROCURA LOCAL: Busca qualquer rádio checado DENTRO desta div
+        const radioSelecionado = div.querySelector('input[type="radio"]:checked');
+        
+        // PROCURA LOCAL: Busca campo de texto DENTRO desta div
+        const inputDescritiva = div.querySelector('input[type="text"]');
+
+        let valorFinal = null;
+
+        if (radioSelecionado) {
+            // Se for rádio, pegamos o valor (será '0', '1', 'true', 'false', etc)
+            valorFinal = radioSelecionado.value;
+        } else if (inputDescritiva) {
+            // Se for texto, pegamos o que foi digitado
+            valorFinal = inputDescritiva.value;
+        }
+
+        respostas.push({
+            questao: i,
+            resposta: valorFinal
+        });
+    });
+
+    console.log("Respostas coletadas com sucesso:", respostas);
+    return respostas;
 }
 
 const templatesArray = Object.values(templates)
 
 function clear() { // Remover questões antigas
-    Array.from(document.body.children).forEach((d) => {
-        if (d.name == "questao") {
-            d.remove()
-        }
-    })
+    answersQuest.innerHTML = '';
 }
 
 function mostrar(questao, num) { // Mostrar as questões criadas por IA
@@ -58,6 +82,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
         if (q.criterios) { // Descritiva
             const crt = document.createElement('h3')
             const inp = document.createElement('input')
+            inp.type = "text"
             crt.textContent = q.criterios
             div.appendChild(crt)
             div.appendChild(inp)
@@ -92,11 +117,11 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
             v.value = true
             f.value = false
 
-            lv.textContent = '✔️'
-            lf.textContent = '❌'
-
             lv.appendChild(v)
+            lv.append(' ✔️')
+
             lf.appendChild(f)
+            lf.append(' ❌')
 
             div.appendChild(lv)
             div.appendChild(lf)
@@ -108,7 +133,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
     const corr = document.createElement('button')
     corr.onclick = () => corrigir()
     corr.textContent = "Corrigir"
-    document.body.appendChild(corr)
+    answersQuest.appendChild(corr)
 }
 
 async function enviar() {
@@ -146,7 +171,7 @@ async function enviar() {
 const sendButton = document.getElementById('send-button')
 
 inputMessage.addEventListener('keydown', (e) => {
-    if(e.key === 'Enter') sendButton.click()
+    if (e.key === 'Enter') sendButton.click()
 })
 
 sendButton.addEventListener('click', enviar)
