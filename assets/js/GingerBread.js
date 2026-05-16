@@ -91,6 +91,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
         if (q.alternativas) { // Múlpipla escolha
             q.alternativas.forEach((a, u) => {
                 const label = document.createElement('label')
+                label.setAttribute('class', 'question-radio')
                 const alt = document.createElement('input')
 
                 alt.type = "radio"
@@ -104,10 +105,15 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
 
         if (q.tipo == 'Verdadeiro ou falso') { // V ou F
             const lv = document.createElement('label')
+            lv.setAttribute('class', 'true-label-quest')
             const lf = document.createElement('label')
+            lf.setAttribute('class', 'false-label-quest')
+
 
             const v = document.createElement('input')
+            v.setAttribute('class', 'radio-input')
             const f = document.createElement('input')
+            f.setAttribute('class', 'radio-input')
 
             v.type = "radio"
             f.type = "radio"
@@ -138,7 +144,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
 
 async function enviar() {
     const token = document.getElementById('key').value
-    const num = document.getElementById('questions-input').value
+    const num = Number(document.getElementById('questions-input').value)
 
     const msg = inputMessage.value
 
