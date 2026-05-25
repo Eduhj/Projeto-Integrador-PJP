@@ -33,9 +33,9 @@ function corrigir() {
     questoes.forEach((div, i) => {
         // PROCURA LOCAL: Busca qualquer rádio checado DENTRO desta div
         const radioSelecionado = div.querySelector('input[type="radio"]:checked');
-        
+
         // PROCURA LOCAL: Busca campo de texto DENTRO desta div
-        const inputDescritiva = div.querySelector('input[type="text"]');
+        const inputDescritiva = div.querySelector('textarea');
 
         let valorFinal = null;
 
@@ -80,10 +80,13 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
         div.appendChild(enc)
 
         if (q.criterios) { // Descritiva
+            const inp = document.createElement('textarea')
+            inp.placeholder = 'Digite sua resposta...'
+            inp.classList.add('descritive-input')
+
             const crt = document.createElement('h3')
-            const inp = document.createElement('input')
-            inp.type = "text"
             crt.textContent = q.criterios
+
             div.appendChild(crt)
             div.appendChild(inp)
         }
@@ -139,6 +142,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
     const corr = document.createElement('button')
     corr.onclick = () => corrigir()
     corr.textContent = "Corrigir"
+    corr.classList.add('correction-button')
     answersQuest.appendChild(corr)
 }
 
