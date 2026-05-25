@@ -23,27 +23,20 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
-
-
 function corrigir() {
-    // Seleciona todas as divs de questões
     const questoes = document.querySelectorAll('.answers');
     const respostas = [];
 
     questoes.forEach((div, i) => {
-        // PROCURA LOCAL: Busca qualquer rádio checado DENTRO desta div
         const radioSelecionado = div.querySelector('input[type="radio"]:checked');
-        
-        // PROCURA LOCAL: Busca campo de texto DENTRO desta div
+
         const inputDescritiva = div.querySelector('input[type="text"]');
 
         let valorFinal = null;
 
         if (radioSelecionado) {
-            // Se for rádio, pegamos o valor (será '0', '1', 'true', 'false', etc)
             valorFinal = radioSelecionado.value;
         } else if (inputDescritiva) {
-            // Se for texto, pegamos o que foi digitado
             valorFinal = inputDescritiva.value;
         }
 
@@ -142,12 +135,9 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
     answersQuest.appendChild(corr)
 }
 
-async function enviar() {
+async function enviar(sistema, usuario, num) {
+
     const token = document.getElementById('key').value
-    const num = Number(document.getElementById('questions-input').value)
-
-    const msg = inputMessage.value
-
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { // Enviar para os servers da groq
         method: "POST",
         headers: {
@@ -158,11 +148,10 @@ async function enviar() {
             model: "llama-3.3-70b-versatile",
             messages: [{
                 role: "system",
-                content: "Sua função é criar questões sobre um assunto escolhido com base em templates prontos, responda apenas em json válido, sem nada adicional."
+                content: String(sistema)
             },
             {
-                role: "user", content: `Crie ${num} questões sobre o tema "${msg}", preencha os campos e retorne o json completo.
-                Template: ${JSON.stringify(templatesArray, null, 2)}`
+                role: "user", content: String(usuario)
             }]
         })
     })
@@ -180,4 +169,14 @@ inputMessage.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendButton.click()
 })
 
-sendButton.addEventListener('click', enviar)
+sendButton.addEventListener('click', () => {
+    const num = Number(document.getElementById('questions-input').value)
+    const msg = inputMessage.value
+    const tem = JSON.stringify(templatesArray, null, 2)
+    enviar(
+        "Sua função é criar questões sobre um assunto escolhido com base em templates prontos, responda apenas em json válido, sem nada adicional.",
+        `Crie ${num} questões sobre o tema "${msg}", preencha os campos e retorne o json completo.
+        Template: ${tem}`,
+        num
+    )
+})
