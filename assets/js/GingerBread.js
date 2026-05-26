@@ -24,46 +24,6 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
-function corrigir() {
-    const questoes = document.querySelectorAll('.answers');
-    const respostas = [];
-
-    questoes.forEach((div, i) => {
-        const radioSelecionado = div.querySelector('input[type="radio"]:checked');
-
-        const inputDescritiva = div.querySelector('textarea');
-
-        let valorFinal = null;
-
-        if (radioSelecionado) {
-            valorFinal = radioSelecionado.value;
-        } else if (inputDescritiva) {
-            valorFinal = inputDescritiva.value;
-        }
-
-        respostas.push({
-            questao: i,
-            resposta: valorFinal
-        });
-    });
-
-    console.log("Respostas coletadas com sucesso:", respostas);
-
-    const correcao = document.createElement('p')
-    correcao.textContent = enviar(
-        "Sua função é corrigir questões respondidas pelo usuário e dar um feedback sobre seus erros e acertos, responda apenas em json válido, sem nada adicional.",
-        respostas, null
-    )
-    CorrectQuest.appendChild(correcao)
-    return respostas;
-}
-
-const templatesArray = Object.values(templates)
-
-function clear() { // Remover questões antigas
-    answersQuest.innerHTML = '';
-}
-
 function mostrar(questao, num) { // Mostrar as questões criadas por IA
     clear()
     questao.forEach((q, i) => { // Questão
@@ -147,6 +107,47 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
     answersQuest.appendChild(corr)
 }
 
+async function corrigir() {
+    const questoes = document.querySelectorAll('.answers');
+    const respostas = [];
+
+    questoes.forEach((div, i) => {
+        const radioSelecionado = div.querySelector('input[type="radio"]:checked');
+
+        const inputDescritiva = div.querySelector('textarea');
+
+        let valorFinal = null;
+
+        if (radioSelecionado) {
+            valorFinal = radioSelecionado.value;
+        } else if (inputDescritiva) {
+            valorFinal = inputDescritiva.value;
+        }
+
+        respostas.push({
+            questao: i,
+            resposta: valorFinal
+        });
+    });
+
+    console.log("Respostas coletadas com sucesso:", respostas);
+
+    const correcao = document.createElement('pre')
+    correcao.textContent = JSON.stringify(await enviar(
+        "Sua função é corrigir questões respondidas pelo usuário e dar um feedback sobre seus erros e acertos, responda apenas em json válido, sem nada adicional.",
+        respostas, null), null, 2)
+
+    CorrectQuest.appendChild(correcao)
+    return respostas
+}
+
+const templatesArray = Object.values(templates)
+
+function clear() { // Remover questões antigas
+    answersQuest.innerHTML = '';
+}
+
+
 async function enviar(sistema, usuario, num) {
 
     const token = document.getElementById('key').value
@@ -172,7 +173,7 @@ async function enviar(sistema, usuario, num) {
     const texto = data.choices[0].message.content
     const limpo = texto.replace(/```json|```/g, "").trim()
     const questao = JSON.parse(limpo)
-    mostrar(questao, num)
+    return questao
 }
 
 const sendButton = document.getElementById('send-button')
@@ -181,14 +182,14 @@ inputMessage.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendButton.click()
 })
 
-sendButton.addEventListener('click', () => {
+sendButton.addEventListener('click', async () => {
     const num = Number(document.getElementById('questions-input').value)
     const msg = inputMessage.value
     const tem = JSON.stringify(templatesArray, null, 2)
-    enviar(
+    const feedback = await enviar(
         "Sua função é criar questões sobre um assunto escolhido com base em templates prontos, responda apenas em json válido, sem nada adicional.",
         `Crie ${num} questões sobre o tema "${msg}", preencha os campos e retorne o json completo.
         Template: ${tem}`,
-        num
-    )
+        num)
+    mostrar(feedback, num)
 })
