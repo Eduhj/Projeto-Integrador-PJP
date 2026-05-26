@@ -1,5 +1,6 @@
 const inputMessage = document.getElementById('subject-input')
 const answersQuest = document.getElementById('questionnaire-answers')
+const CorrectQuest = document.getElementById('questionnaire-correction')
 
 const templates = { // Templates para a IA usar de base
     MultEsc: {
@@ -30,7 +31,6 @@ function corrigir() {
     questoes.forEach((div, i) => {
         const radioSelecionado = div.querySelector('input[type="radio"]:checked');
 
-        // PROCURA LOCAL: Busca campo de texto DENTRO desta div
         const inputDescritiva = div.querySelector('textarea');
 
         let valorFinal = null;
@@ -48,6 +48,13 @@ function corrigir() {
     });
 
     console.log("Respostas coletadas com sucesso:", respostas);
+
+    const correcao = document.createElement('p')
+    correcao.textContent = enviar(
+        "Sua função é corrigir questões respondidas pelo usuário e dar um feedback sobre seus erros e acertos, responda apenas em json válido, sem nada adicional.",
+        respostas, null
+    )
+    CorrectQuest.appendChild(correcao)
     return respostas;
 }
 
