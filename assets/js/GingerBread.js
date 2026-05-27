@@ -20,7 +20,6 @@ const templates = { // Templates para a IA usar de base
         tipo: "Descritiva",
         enunciado: "",
         criterios: "",
-        resposta_esperada: ""
     }
 }
 
@@ -34,6 +33,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
         const lst = document.createElement('ul')
         const enc = document.createElement('h2')
 
+        enc.setAttribute('name', 'Enunciado')
         enc.textContent = q.enunciado
 
         div.name = "questao"
@@ -46,6 +46,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
             inp.classList.add('descritive-input')
 
             const crt = document.createElement('h3')
+            crt.name = "Criterios"
             crt.textContent = q.criterios
 
             div.appendChild(crt)
@@ -108,24 +109,29 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
 }
 
 async function corrigir() {
-    const questoes = document.querySelectorAll('.answers');
+    
+    const questoes = document.querySelectorAll('.answers')
     const respostas = [];
+    
 
     questoes.forEach((div, i) => {
-        const radioSelecionado = div.querySelector('input[type="radio"]:checked');
-
-        const inputDescritiva = div.querySelector('textarea');
+        const radioSelecionado = div.querySelector('input[type="radio"]:checked')
+        const enunciado = div.querySelector('[name="Enunciado"]')
+        const inputDescritiva = div.querySelector('textarea')
 
         let valorFinal = null;
 
         if (radioSelecionado) {
-            valorFinal = radioSelecionado.value;
+            valorFinal = radioSelecionado.value
         } else if (inputDescritiva) {
-            valorFinal = inputDescritiva.value;
+            let criterios = div.querySelector('[name="Criterios"]')
+            let esperado = div.querySelector('[name="Esperado"]')
+            valorFinal = inputDescritiva.value
         }
 
         respostas.push({
             questao: i,
+            enunciado: enunciado,
             resposta: valorFinal
         });
     });
