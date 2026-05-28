@@ -23,10 +23,13 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
-function mostrar(questao, num) { // Mostrar as questões criadas por IA
-    clear()
-    questao.forEach((q, i) => { // Questão
+let perguntas = []
 
+function mostrar(questao, num) { // Mostrar as questões criadas por IA
+    clear_div()
+    perguntas = []
+
+    questao.forEach((q, i) => { // Questão
         console.log(q)
 
         const div = document.createElement('div')
@@ -40,6 +43,11 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
         div.setAttribute('class', 'answers')
         div.appendChild(enc)
 
+        perguntas.push({
+            questao: i,
+            enunciado: q.enunciado
+        })
+
         if (q.criterios) { // Descritiva
             const inp = document.createElement('textarea')
             inp.placeholder = 'Digite sua resposta...'
@@ -51,6 +59,11 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
 
             div.appendChild(crt)
             div.appendChild(inp)
+
+            perguntas.push({
+                questao: i,
+                criterios: q.criterios
+            })
         }
 
         if (q.alternativas) { // Múlpipla escolha
@@ -65,6 +78,12 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
                 label.appendChild(alt)
                 label.append(a)
                 div.appendChild(label)
+
+                perguntas.push({
+                    questao: i,
+                    tipo: q.tipo,
+                    gabarito: q.gabarito
+                })
             })
         }
 
@@ -96,6 +115,12 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
 
             div.appendChild(lv)
             div.appendChild(lf)
+
+            perguntas.push({
+                questao: i,
+                tipo: q.tipo,
+                gabarito: q.gabarito
+            })
         }
 
         answersQuest.appendChild(div)
@@ -109,29 +134,30 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
 }
 
 async function corrigir() {
-    
     const questoes = document.querySelectorAll('.answers')
     const respostas = [];
-    
 
     questoes.forEach((div, i) => {
         const radioSelecionado = div.querySelector('input[type="radio"]:checked')
         const enunciado = div.querySelector('[name="Enunciado"]')
         const inputDescritiva = div.querySelector('textarea')
+        const criterios = div.querySelector('[name="Criterios"]')
+
+        const dadosQuestao = perguntas.find(p => p.questao === i && p.gabarito !== undefined)
 
         let valorFinal = null;
 
         if (radioSelecionado) {
             valorFinal = radioSelecionado.value
         } else if (inputDescritiva) {
-            let criterios = div.querySelector('[name="Criterios"]')
-            let esperado = div.querySelector('[name="Esperado"]')
             valorFinal = inputDescritiva.value
         }
 
         respostas.push({
             questao: i,
-            enunciado: enunciado,
+            enunciado: enunciado?.textContent ?? '',
+            criterios: criterios?.textContent ?? null,
+            gabarito: dadosQuestao?.gabarito ?? null,
             resposta: valorFinal
         });
     });
@@ -141,7 +167,7 @@ async function corrigir() {
     const correcao = document.createElement('pre')
     correcao.textContent = JSON.stringify(await enviar(
         "Sua função é corrigir questões respondidas pelo usuário e dar um feedback sobre seus erros e acertos, responda apenas em json válido, sem nada adicional.",
-        respostas, null), null, 2)
+        JSON.stringify(respostas), null), null, 2)
 
     CorrectQuest.appendChild(correcao)
     return respostas
@@ -149,7 +175,7 @@ async function corrigir() {
 
 const templatesArray = Object.values(templates)
 
-function clear() { // Remover questões antigas
+function clear_div() { // Remover questões antigas
     answersQuest.innerHTML = '';
 }
 
