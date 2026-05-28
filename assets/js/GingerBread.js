@@ -1,6 +1,8 @@
 const inputMessage = document.getElementById('subject-input')
 const answersQuest = document.getElementById('questionnaire-answers')
-const CorrectQuest = document.getElementById('questionnaire-correction')
+const correctQuest = document.getElementById('questionnaire-correction')
+const clearButton = document.getElementById('clear-button')
+const sendButton = document.getElementById('send-button')
 
 const templates = { // Templates para a IA usar de base
     MultEsc: {
@@ -9,13 +11,13 @@ const templates = { // Templates para a IA usar de base
         alternativas: ["", "", "", ""],
         gabarito: 0
     },
-
+    
     VddouFls: {
         tipo: "Verdadeiro ou falso",
         enunciado: "",
         gabarito: true
     },
-
+    
     Descrito: {
         tipo: "Descritiva",
         enunciado: "",
@@ -23,14 +25,18 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
+function clearQuests() { // Remover questões antigas
+    answersQuest.innerHTML = '';
+    correctQuest.innerHTML = '';
+}
+
 let perguntas = []
 
-function mostrar(questao, num) { // Mostrar as questões criadas por IA
-    clear_div()
+function showQuestions(questao, questionsNumber) { // Mostrar as questões criadas por IA
+    clearQuests()
     perguntas = []
 
     questao.forEach((q, i) => { // Questão
-        console.log(q)
 
         const div = document.createElement('div')
         const lst = document.createElement('ul')
@@ -86,7 +92,7 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
                 })
             })
         }
-
+        
         if (q.tipo == 'Verdadeiro ou falso') { // V ou F
             const lv = document.createElement('label')
             lv.setAttribute('class', 'true-label-quest')
@@ -127,7 +133,6 @@ function mostrar(questao, num) { // Mostrar as questões criadas por IA
     })
 
     const corr = document.createElement('button')
-    corr.onclick = () => corrigir()
     corr.textContent = "Corrigir"
     corr.classList.add('correction-button')
     answersQuest.appendChild(corr)
@@ -162,25 +167,20 @@ async function corrigir() {
         });
     });
 
-    console.log("Respostas coletadas com sucesso:", respostas);
+    // console.log("Respostas coletadas com sucesso:", respostas);
 
     const correcao = document.createElement('pre')
     correcao.textContent = JSON.stringify(await enviar(
         "Sua função é corrigir questões respondidas pelo usuário e dar um feedback sobre seus erros e acertos, responda apenas em json válido, sem nada adicional.",
         JSON.stringify(respostas), null), null, 2)
 
-    CorrectQuest.appendChild(correcao)
+    correctQuest.appendChild(correcao)
     return respostas
 }
 
 const templatesArray = Object.values(templates)
 
-function clear_div() { // Remover questões antigas
-    answersQuest.innerHTML = '';
-}
-
-
-async function enviar(sistema, usuario, num) {
+async function enviar(sistema, usuario, questionsNumber) {
 
     const token = document.getElementById('key').value
     const res = await fetch('https://api.groq.com/openai/v1/chat/completions', { // Enviar para os servers da groq
@@ -208,20 +208,26 @@ async function enviar(sistema, usuario, num) {
     return questao
 }
 
-const sendButton = document.getElementById('send-button')
+async function sendQuestions() {
+    const questionsNumber = Number(document.getElementById('questions-input').value)
+    const msg = inputMessage.value
+    const tem = JSON.stringify(templatesArray, null, 2)
+    const feedback = await enviar(
+        "Sua função é criar questões sobre um assunto escolhido com base em templates prontos, responda apenas em json válido, sem nada adicional.",
+        `Crie ${questionsNumber} questões sobre o tema "${msg}", preencha os campos e retorne o json completo.
+        Template: ${tem}`,
+        questionsNumber)
+    showQuestions(feedback, questionsNumber)
+}   
 
 inputMessage.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendButton.click()
 })
 
-sendButton.addEventListener('click', async () => {
-    const num = Number(document.getElementById('questions-input').value)
-    const msg = inputMessage.value
-    const tem = JSON.stringify(templatesArray, null, 2)
-    const feedback = await enviar(
-        "Sua função é criar questões sobre um assunto escolhido com base em templates prontos, responda apenas em json válido, sem nada adicional.",
-        `Crie ${num} questões sobre o tema "${msg}", preencha os campos e retorne o json completo.
-        Template: ${tem}`,
-        num)
-    mostrar(feedback, num)
+document.addEventListener('click', (e) => {
+    const target = e.target
+
+    if (target.id === 'send-button') sendQuestions()
+    if (target.id === 'clear-button') clearQuests()
+    if (target.classList.contains('correction-button')) corrigir()
 })
