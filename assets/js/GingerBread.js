@@ -25,6 +25,22 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
+function importQuestionsStorage() {
+    const questionsStorage = localStorage.getItem('questions');
+    
+    if (questionsStorage) {
+        try {
+            const questionsArray = JSON.parse(questionsStorage);
+            
+            if (Array.isArray(questionsArray) && questionsArray.length > 0) {
+                showQuestions(questionsArray, questionsArray.length);
+            }
+        } catch (erro) {
+            console.error("Erro ao ler as questões do Local Storage:", erro);
+        }
+    }
+}
+
 function clearQuests() { // Remover questões antigas
     answersQuest.innerHTML = '';
     correctQuest.innerHTML = '';
@@ -201,10 +217,14 @@ async function enviar(sistema, usuario, questionsNumber) {
         })
     })
 
+    
     const data = await res.json()
     const texto = data.choices[0].message.content
     const limpo = texto.replace(/```json|```/g, "").trim()
     const questao = JSON.parse(limpo)
+
+    localStorage.setItem('questions', JSON.stringify(questao))
+
     return questao
 }
 
@@ -231,3 +251,5 @@ document.addEventListener('click', (e) => {
     if (target.id === 'clear-button') clearQuests()
     if (target.classList.contains('correction-button')) corrigir()
 })
+
+importQuestionsStorage()
