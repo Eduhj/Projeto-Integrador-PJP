@@ -25,6 +25,30 @@ const templates = { // Templates para a IA usar de base
     }
 }
 
+const correction_templates = {
+    MultEsc: {
+        tipo: "Multipla escolha",
+        enunciado: "",
+        alternativa_correta: "",
+        alternativa_escolhida: "",
+        feedback: ""
+    },
+    
+    VddouFls: {
+        tipo: "Verdadeiro ou falso",
+        enunciado: "",
+        alternativa_correta: "",
+        alternativa_escolhida: "",
+    },
+    
+    Descrito: {
+        tipo: "Descritiva",
+        enunciado: "",
+        criterios: "",
+        feedback: ""
+    }
+}
+
 function importQuestionsStorage() {
     const questionsStorage = localStorage.getItem('questions');
     
@@ -152,6 +176,12 @@ function showQuestions(questao, questionsNumber) { // Mostrar as questões criad
     corr.textContent = "Corrigir"
     corr.classList.add('correction-button')
     answersQuest.appendChild(corr)
+}
+
+function showCorrection(corr) {
+    corr.forEach((c) => {
+        
+    })
 }
 
 async function corrigir() {
