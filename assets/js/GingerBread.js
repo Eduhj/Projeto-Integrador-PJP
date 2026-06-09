@@ -1,6 +1,6 @@
 const inputMessage = document.getElementById('subject-input')
 const answersQuest = document.getElementById('questionnaire-answers')
-const correctQuest = document.getElementById('questionnaire-correction')
+const CorrectQuest = document.getElementById('questionnaire-correction')
 const clearButton = document.getElementById('clear-button')
 const sendButton = document.getElementById('send-button')
 
@@ -67,7 +67,7 @@ function importQuestionsStorage() {
 
 function clearQuests() { // Remover questões antigas
     answersQuest.innerHTML = '';
-    correctQuest.innerHTML = '';
+    CorrectQuest.innerHTML = '';
 }
 
 let perguntas = []
@@ -184,6 +184,36 @@ function showCorrection(corr) {
     })
 }
 
+function renderCorrecao(dados, container) {
+    const questoes = Array.isArray(dados) ? dados : (dados.questoes || []);
+    const acertos = questoes.filter(q => q.acerto).length;
+    const erros = questoes.length - acertos;
+    const pct = questoes.length ? Math.round((acertos / questoes.length) * 100) : 0;
+
+    let html = `
+    <div class="resumo">
+        <div class="metric"><div class="num verde">${acertos}</div><div class="lbl">acertos</div></div>
+        <div class="metric"><div class="num vermelho">${erros}</div><div class="lbl">erros</div></div>
+        <div class="metric"><div class="num">${pct}%</div><div class="lbl">aproveitamento</div></div>
+    </div>`;
+
+    questoes.forEach(q => {
+        html += `
+      <div class="questao-card">
+        <div class="questao-header">
+            <span>Questão ${q.numero + 1}</span>
+            <span class="badge ${q.acerto ? 'badge-acerto' : 'badge-erro'}">${q.acerto ? '✓ Correto' : '✗ Incorreto'}</span>
+        </div>
+        ${q.enunciado ? `<p>${q.enunciado}</p>` : ''}
+        <div><span>Sua resposta:</span> ${q.resposta_usuario ?? '—'}</div>
+        ${q.gabarito != null ? `<div><span>Gabarito:</span> ${q.gabarito}</div>` : ''}
+        ${q.feedback ? `<div class="feedback-box">${q.feedback}</div>` : ''}
+      </div>`;
+    });
+
+    container.innerHTML = html;
+}
+
 async function corrigir() {
     const questoes = document.querySelectorAll('.answers')
     const respostas = [];
@@ -213,14 +243,26 @@ async function corrigir() {
         });
     });
 
-    // console.log("Respostas coletadas com sucesso:", respostas);
+    console.log("Respostas coletadas com sucesso:", respostas);
 
-    const correcao = document.createElement('pre')
-    correcao.textContent = JSON.stringify(await enviar(
-        "Sua função é corrigir questões respondidas pelo usuário e dar um feedback sobre seus erros e acertos, responda apenas em json válido, sem nada adicional.",
-        JSON.stringify(respostas), null), null, 2)
+    const resultado = await enviar(`Sua função é corrigir questões respondidas pelo usuário e dar um feedback sobre seus erros e acertos.
+   Responda APENAS em JSON válido, sem nada adicional, no seguinte formato:
+   {
+     "questoes": [
+       {
+         "numero": 1,
+         "enunciado": "...",
+         "resposta_usuario": "...",
+         "gabarito": "...",
+         "acerto": true,
+         "feedback": "..."
+       }
+     ]
+   }
+   Quando gabarito não for null, compare seu valor com a resposta.`,
+        JSON.stringify(respostas), null)
+    renderCorrecao(resultado, CorrectQuest)
 
-    correctQuest.appendChild(correcao)
     return respostas
 }
 

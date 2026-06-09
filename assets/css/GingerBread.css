@@ -171,7 +171,7 @@
   }
 
   /* ─── BUTTON ─── */
-  .header-buttons {
+  #send-button {
     font-family: var(--pixel);
     font-size: 0.6rem;
     padding: 0.75rem 1.2rem;
@@ -190,12 +190,12 @@
     top: 0;
   }
 
-  .header-buttons:hover {
+  #send-button:hover {
     filter: brightness(1.15);
     box-shadow: 0 4px 0 #7a4800, 0 0 20px #f5a62399, 0 0 50px #f5a62333;
   }
 
-  .header-buttons:active {
+  #send-button:active {
     transform: translateY(3px);
     box-shadow: 0 1px 0 #7a4800;
   }
@@ -412,7 +412,7 @@
     }
     .questions-input { flex: 1 1 auto; width: 100%; }
     .subject-input   { width: 100%; }
-    .header-buttons    { width: 100%; padding: 1rem; }
+    #send-button     { width: 100%; padding: 1rem; }
     .correction-button { width: 100%; }
   }
 
@@ -512,4 +512,168 @@
   outline: none;
   border-color: var(--accent-3);
   box-shadow: var(--glow-2);
+}
+
+/* ─── CORREÇÃO — RESUMO ─── */
+.resumo {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.metric {
+  flex: 1;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.metric:hover {
+  border-color: var(--accent-3);
+  box-shadow: var(--glow-2);
+}
+
+.metric .num {
+  font-family: var(--pixel);
+  font-size: 1.4rem;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.metric .lbl {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.verde   { color: var(--accent-3); text-shadow: var(--glow-2); }
+.vermelho { color: var(--accent-2); text-shadow: 0 0 10px #ff6b6b88; }
+.amarelo  { color: var(--accent);  text-shadow: var(--glow); }
+
+/* ─── CORREÇÃO — QUESTÃO CARD ─── */
+.questao-card {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 12px;
+  position: relative;
+  overflow: hidden;
+  animation: slideIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transition: border-color 0.25s, box-shadow 0.25s;
+}
+
+.questao-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px;
+  height: 100%;
+  border-radius: var(--radius) 0 0 var(--radius);
+}
+
+.questao-card.acerto::after { background: linear-gradient(180deg, var(--accent-3), #2fbaba); }
+.questao-card.erro::after   { background: linear-gradient(180deg, var(--accent-2), #c04444); }
+.questao-card.acerto { border-color: #4ecdc455; }
+.questao-card.erro   { border-color: #ff6b6b44; }
+.questao-card:hover  { box-shadow: var(--glow-2), 0 8px 32px #00000044; }
+
+/* ─── CORREÇÃO — HEADER ─── */
+.questao-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.9rem;
+}
+
+.questao-num {
+  font-family: var(--pixel);
+  font-size: 0.5rem;
+  color: var(--text-dim);
+  letter-spacing: 0.1em;
+}
+
+.badge {
+  font-family: var(--pixel);
+  font-size: 0.45rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  letter-spacing: 0.05em;
+}
+
+.badge-acerto { background: #4ecdc418; color: var(--accent-3); border: 1px solid #4ecdc455; }
+.badge-erro   { background: #ff6b6b18; color: var(--accent-2); border: 1px solid #ff6b6b44; }
+
+/* ─── CORREÇÃO — CONTEÚDO ─── */
+.questao-card .enunciado {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.7rem;
+  line-height: 1.6;
+}
+
+.questao-row {
+  display: flex;
+  gap: 8px;
+  font-size: 0.82rem;
+  margin-bottom: 5px;
+  align-items: baseline;
+}
+
+.questao-row .row-label {
+  color: var(--text-dim);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+  min-width: 90px;
+}
+
+.questao-row .row-val { color: var(--text); font-weight: 700; }
+
+/* ─── CORREÇÃO — FEEDBACK ─── */
+.feedback-box {
+  margin-top: 0.85rem;
+  padding: 0.75rem 1rem;
+  background: var(--panel-2);
+  border-left: 3px solid var(--accent-3);
+  border-radius: 0 8px 8px 0;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.65;
+}
+
+/* ─── CLEAR BUTTON ─── */
+#clear-button {
+  font-family: var(--pixel);
+  font-size: 0.6rem;
+  padding: 0.75rem 1.2rem;
+  background: var(--accent-2);
+  color: #1a0000;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  box-shadow: 0 4px 0 #7a1a1a, 0 0 12px #ff6b6b55, 0 0 30px #ff6b6b22;
+  transition: transform 0.1s, box-shadow 0.1s, filter 0.2s;
+  white-space: nowrap;
+  position: relative;
+  top: 0;
+}
+
+#clear-button:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 4px 0 #7a1a1a, 0 0 20px #ff6b6b99, 0 0 50px #ff6b6b33;
+}
+
+#clear-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #7a1a1a;
 }
