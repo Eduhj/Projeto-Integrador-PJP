@@ -259,7 +259,7 @@ async function corrigir() {
        }
      ]
    }
-   Quando gabarito não for null, compare seu valor com a resposta.`,
+   Quando gabarito não for null, compare seu valor com a resposta. Quando houver, substitua os valores de alternativas (0, 1, 2, 3) por (a, b, c, d) e (true/false) por (verdadeiro/falso)`,
         JSON.stringify(respostas), null)
     renderCorrecao(resultado, CorrectQuest)
 
@@ -279,6 +279,7 @@ async function enviar(sistema, usuario, questionsNumber) {
         },
         body: JSON.stringify({
             model: "llama-3.3-70b-versatile",
+            temperature: 0.5,
             messages: [{
                 role: "system",
                 content: String(sistema)
@@ -307,7 +308,7 @@ async function sendQuestions() {
     const feedback = await enviar(
         "Sua função é criar questões sobre um assunto escolhido com base em templates prontos, responda apenas em json válido, sem nada adicional.",
         `Crie ${questionsNumber} questões sobre o tema "${msg}", preencha os campos e retorne o json completo.
-        Template: ${tem}`,
+        Template: ${tem} ; (cuidado para não dar a resposta ao adicionar um critério, ele deve ser usado apenas como direcionamento para o usuário)`,
         questionsNumber)
     showQuestions(feedback, questionsNumber)
 }   
